@@ -1,3 +1,6 @@
+// Copyright (c) 2019 Jonathan Vice
+// This file is part of Furrel.
+
 #include <iostream>
 #include <string>
 #include "TuringMachine.h"
@@ -8,6 +11,7 @@ TuringMachine::TuringMachine(std::string input) : tape() {
 	states.push_back(std::shared_ptr<State>::shared_ptr(new State(0)));
 	std::cout << "From\tTo\tRead\tWrite\tMove" << std::endl;
 	decodeMachine(input);
+	std::cout << "here" << std::endl;
 	tapeHead = tape.begin();
 	tapeHead++; // Move passed # in pos 0
 }
@@ -37,7 +41,6 @@ void TuringMachine::addEdge(std::shared_ptr<State> firstState, std::shared_ptr<S
 	}
 }
 
-// Move the tape head left or right
 void TuringMachine::move(bool dir) {
 	if (dir) tapeHead--;
 	else tapeHead++;
@@ -68,7 +71,7 @@ void TuringMachine::setTape(std::string input) {
 }
 
 /* Private Member Functions */
-// Recursive function to decode the machine from CWL
+
 void TuringMachine::decodeMachine(std::string &machine) {
 	int from, to, i = -1, sFrom = -1, sTo = -1;
 	char read, write, curr;
@@ -104,6 +107,14 @@ void TuringMachine::decodeMachine(std::string &machine) {
 
 	dir = machine[i++] == 'a';
 
+	{
+		using namespace std;
+		cout << "machine line: " << machine << endl;
+		cout << "machine length: " << machine.length() << endl;
+		cout << "i: " << i << endl;
+	}
+
+	if (machine.length() <= i) i--;
 	machine = machine.substr(i, (machine.length() - i)); // Prepare for next edge decoding
 
 	// Create states if needed
@@ -123,16 +134,16 @@ void TuringMachine::decodeMachine(std::string &machine) {
 	
 	std::cout << from << "\t" << to << "\t" << read << "\t" << write << "\t" << dir << std::endl;
 
+	// Use these for readability
 	std::shared_ptr<State> fromPtr = std::shared_ptr<State>::shared_ptr(states.at(from).get());
 	std::shared_ptr<State> toPtr = std::shared_ptr<State>::shared_ptr(states.at(to).get());
 	std::shared_ptr<Edge> edgePtr = std::shared_ptr<Edge>(new Edge(read, write, dir));
 
 	addEdge(fromPtr, toPtr, edgePtr);
-	
-	if (machine.length() > 1) decodeMachine(machine);
+	std::cout << "Machine length after decode: " << machine.length() << std::endl;
+	if (machine.length() > 1) decodeMachine(machine); // Run again if the machine length is still greater than 1
 }
 
-// Function to convert the 2-char code into a single char
 char TuringMachine::convertChar(std::string code) {
 	if (code == "aa") return 'a';
 	else if (code == "ab") return 'b';

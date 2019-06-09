@@ -1,3 +1,6 @@
+// Copyright (c) 2019 Jonathan Vice
+// This file is part of Furrel.
+
 #include <iostream>
 #include "TuringMachine.h"
 
