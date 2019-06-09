@@ -10,10 +10,10 @@
 
 class Link {
 public:
-	/* Constructor with 2 States and an Edge */
+	/* Constructor with start and end States and an Edge between them */
 	Link(std::shared_ptr<State> start, std::shared_ptr<State> end, std::shared_ptr<Edge> edge);
 	
-	/* Constructor with 2 States */
+	/* Constructor with start and end States */
 	Link(std::shared_ptr<State> start, std::shared_ptr<State> end);
 
 	/* Adds an existing Edge */
