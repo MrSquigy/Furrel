@@ -9,7 +9,7 @@
 
 class TuringMachine {
 public:
-	/* Default constructor from machine CWL string */
+	/* Constructor from machine CWL string */
 	TuringMachine(std::string input = "");
 	
 	/* Copy constructor */
