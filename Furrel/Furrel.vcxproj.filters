@@ -27,6 +27,9 @@
     <ClCompile Include="State.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Link.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TuringMachine.h">
@@ -36,6 +39,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="State.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Link.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

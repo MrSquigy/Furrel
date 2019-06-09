@@ -124,12 +124,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Edge.cpp" />
+    <ClCompile Include="Link.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="TuringMachine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Edge.h" />
+    <ClInclude Include="Link.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="TuringMachine.h" />
   </ItemGroup>
