@@ -30,6 +30,18 @@ TuringMachine& TuringMachine::operator=(TuringMachine& tm) {
 	return *this;
 }
 
+std::string TuringMachine::run() {
+	// TODO: Write this function lol
+
+	State* currentState = (*states.begin()).get(); // Get the first state
+
+	while (!currentState->isHaltState()) { // Run through Edges until a halt State is reached
+		break;
+	}
+
+	return getTapeAsString();
+}
+
 void TuringMachine::addEdge(std::shared_ptr<State> firstState, std::shared_ptr<State> secondState, std::shared_ptr<Edge> edge) {
 	// Check if a link exists
 	for (auto& link : links) {
@@ -107,12 +119,12 @@ void TuringMachine::machineDecode(std::string machine) {
 		}
 
 		if (sFrom == -1) {
-			states.push_back(std::shared_ptr<State>::shared_ptr(new State(from)));
+			states.push_back(std::shared_ptr<State>::shared_ptr(new State(from, from == 1)));
 			std::cout << "Created state " << from << std::endl;
 		}
 
-		if (sTo == -1) {
-			states.push_back(std::shared_ptr<State>::shared_ptr(new State(to)));
+		if (sTo == -1 && sTo != sFrom) {
+			states.push_back(std::shared_ptr<State>::shared_ptr(new State(to, to == 1)));
 			std::cout << "Created state " << to << std::endl;
 		}
 
@@ -130,4 +142,18 @@ char TuringMachine::convertChar(std::string code) {
 	else if (code == "ba") return '^';
 	else if (code == "bb") return '#';
 	else return '!';
+}
+
+std::vector<int> TuringMachine::getLinks(const State& start) {
+	std::vector<int> ret;
+	int counter = 0;
+
+	for (const auto& link : links) {
+		if (link->checkLink(start)) {
+			ret.push_back(counter);
+			counter++;
+		}
+	}
+
+	return ret;
 }

@@ -17,6 +17,9 @@ public:
 	
 	/* Copy assignment constructor */
 	TuringMachine& operator=(TuringMachine &tm);
+
+	/* Runs the TM */
+	std::string run();
 	
 	/* Adds Edge and new Link if needed between States passed */
 	void addEdge(std::shared_ptr<State> firstState, std::shared_ptr<State> secondState, std::shared_ptr<Edge> edge);
@@ -41,6 +44,9 @@ private:
 	
 	/* Converts the 2-char code into a single char */
 	char convertChar(std::string code);
+
+	/* Returns vector of Links with start State passed */
+	std::vector<int> getLinks(const State& start);
 	
 	/* Vector of States */
 	std::vector<std::shared_ptr<State>> states;
