@@ -9,7 +9,7 @@
 class State {
 public:
 	/* Constructor with State number and optional halt param */
-	State(int stateNum);
+	State(int stateNum, bool halt = false);
 
 	/* Equality operator, returns true if the passed object matches this one */
 	bool operator==(const State& ste);
@@ -19,9 +19,6 @@ public:
 
 	/* Returns true if this is a halt State */
 	bool isHaltState();
-
-	/* Sets whether or not this is a halt State */
-	void setHaltState(bool halt);
 private:
 	/* State number */
 	int num;

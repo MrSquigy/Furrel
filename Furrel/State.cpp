@@ -6,7 +6,7 @@
 
 /* Public Member Functions */
 
-State::State(int stateNum) : num(stateNum), haltState(false) {}
+State::State(int stateNum, bool halt) : num(stateNum), haltState(halt) {}
 
 bool State::operator==(const State& ste) { return num == ste.num; }
 
@@ -15,8 +15,3 @@ bool State::operator==(const State& ste) { return num == ste.num; }
 int State::getNum() { return num; }
 
 bool State::isHaltState() { return haltState; }
-
-/* Setter Functions */
-void State::setHaltState(bool halt) {
-	haltState = halt;
-}
