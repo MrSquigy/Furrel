@@ -27,6 +27,9 @@ public:
 
 	/* Returns true if this link is between the States passed */
 	bool checkLink(const State& start, const State& end);
+
+	/* Overload for first State only */
+	bool checkLink(const State& start);
 private:
 	/* Start State */
 	std::shared_ptr<State> startState;

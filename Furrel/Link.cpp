@@ -33,3 +33,7 @@ bool Link::canCross(char letter) {
 bool Link::checkLink(const State& start, const State& end) {
 	return *startState == start && *endState == end;
 }
+
+bool Link::checkLink(const State& start) {
+	return *startState == start;
+}
