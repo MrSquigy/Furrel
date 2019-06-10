@@ -13,6 +13,8 @@ TuringMachine::TuringMachine(std::string input) : tape() {
 	machineDecode(input);
 	tapeHead = tape.begin();
 	tapeHead++; // Move passed # in pos 0
+	std::cout << "Tape Head: " << *tapeHead << std::endl;
+	printTape();
 }
 
 TuringMachine::TuringMachine(TuringMachine& tm) : tapeHead(tm.tapeHead), tape() {
@@ -46,7 +48,7 @@ void TuringMachine::move(bool dir) {
 }
 
 void TuringMachine::printTape() {
-	std::cout << getTapeAsString() << std::endl;
+	std::cout << "The Tape: " << getTapeAsString() << std::endl;
 }
 
 /* Getter Functions */
@@ -54,9 +56,7 @@ void TuringMachine::printTape() {
 char TuringMachine::getCurrentChar() { return *tapeHead; }
 
 std::string TuringMachine::getTapeAsString() {
-	std::string output = "";
-
-	for (std::vector<char>::iterator letter = tape.begin(); letter != tape.end(); ++letter) output = output + *letter;
+	std::string output(tape.begin(), tape.end());
 
 	return output;
 }
@@ -65,7 +65,7 @@ std::string TuringMachine::getTapeAsString() {
 
 void TuringMachine::setTape(std::string input) {
 	tape.clear();
-	tape.push_back('#');
+	if (input[0] != '#') tape.push_back('#');
 	for (std::string::iterator i = input.begin(); i != input.end(); ++i) tape.push_back(*i);
 }
 
@@ -75,24 +75,21 @@ void TuringMachine::machineDecode(std::string machine) {
 	int from, to, lineStart, sFrom, sTo, i = 0;
 	char read, write, curr;
 	bool dir;
-	std::string local = machine;
+	std::string localMachine = machine;
 
-	while ((unsigned)i < std::size(local)) {
-		//std::cout << "Machine Line: " << local.substr(i, std::size(local) - i) << std::endl;
-		//std::cout << "Size: " << std::size(local) << std::endl;
-		
+	while (localMachine[i] != '#') {
 		// Set default vars for loop
 		lineStart = i;
 		sFrom = sTo = -1;
 		
 		// Count first number of a's (First State number)
-		curr = local[i];
-		while (curr != 'b') curr = local[++i];
+		curr = localMachine[i];
+		while (curr != 'b') curr = localMachine[++i];
 		from = i - lineStart;
 
 		// Count second number of a's (Second State number)
-		curr = local[++i];
-		while (curr != 'b') curr = local[++i];
+		curr = localMachine[++i];
+		while (curr != 'b') curr = localMachine[++i];
 		to = i - lineStart - from - 1; // Extra 1 because of the b between
 
 		// Get the read/write characters
@@ -124,7 +121,7 @@ void TuringMachine::machineDecode(std::string machine) {
 		std::cout << from << "\t" << to << "\t" << read << "\t" << write << "\t" << (dir ? "L" : "R") << std::endl;
 	}
 
-	setTape(machine.substr(i, std::size(machine) - (unsigned)i));
+	setTape(machine.substr(i, std::size(localMachine) - (unsigned)i));
 }
 
 char TuringMachine::convertChar(std::string code) {
