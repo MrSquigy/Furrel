@@ -10,8 +10,7 @@
 TuringMachine::TuringMachine(std::string input) : tape() {
 	states.push_back(std::shared_ptr<State>::shared_ptr(new State(0)));
 	std::cout << "From\tTo\tRead\tWrite\tMove" << std::endl;
-	decodeMachine(input);
-	std::cout << "here" << std::endl;
+	machineDecode(input);
 	tapeHead = tape.begin();
 	tapeHead++; // Move passed # in pos 0
 }
@@ -72,76 +71,60 @@ void TuringMachine::setTape(std::string input) {
 
 /* Private Member Functions */
 
-void TuringMachine::decodeMachine(std::string &machine) {
-	int from, to, i = -1, sFrom = -1, sTo = -1;
+void TuringMachine::machineDecode(std::string machine) {
+	int from, to, lineStart, sFrom, sTo, i = 0;
 	char read, write, curr;
 	bool dir;
-	
-	std::cout << "Machine Line: " << machine << std::endl;
-	std::cout << "Length: " << machine.length() << std::endl;
+	std::string local = machine;
 
-	do {
-		i++;
-		curr = machine[i];
-	} while (curr != 'b');
-	from = i;
+	while ((unsigned)i < std::size(local)) {
+		//std::cout << "Machine Line: " << local.substr(i, std::size(local) - i) << std::endl;
+		//std::cout << "Size: " << std::size(local) << std::endl;
+		
+		// Set default vars for loop
+		lineStart = i;
+		sFrom = sTo = -1;
+		
+		// Count first number of a's (First State number)
+		curr = local[i];
+		while (curr != 'b') curr = local[++i];
+		from = i - lineStart;
 
-	do {
-		i++;
-		curr = machine[i];
-	} while (curr != 'b');
-	to = i > from ? i - from - 1 : from - i - 1;
+		// Count second number of a's (Second State number)
+		curr = local[++i];
+		while (curr != 'b') curr = local[++i];
+		to = i - lineStart - from - 1; // Extra 1 because of the b between
 
-	curr = machine[i];
-	while (curr != 'b') {
-		i++;
-		to++;
-		curr = machine[i];
+		// Get the read/write characters
+		read = convertChar(machine.substr(++i, 2));
+		i += 2;
+		write = convertChar(machine.substr(i, 2));
+		i += 2;
+
+		dir = machine[i++] == 'a'; // Get direction
+
+		// Create states if needed
+		for (const auto& state : states) {
+			if (state->getNum() == from) sFrom = from;
+			if (state->getNum() == to) sTo = to;
+		}
+
+		if (sFrom == -1) {
+			states.push_back(std::shared_ptr<State>::shared_ptr(new State(from)));
+			std::cout << "Created state " << from << std::endl;
+		}
+
+		if (sTo == -1) {
+			states.push_back(std::shared_ptr<State>::shared_ptr(new State(to)));
+			std::cout << "Created state " << to << std::endl;
+		}
+
+		addEdge(std::shared_ptr<State>::shared_ptr(states.at(from)), std::shared_ptr<State>::shared_ptr(states.at(to)), std::shared_ptr<Edge>(new Edge(read, write, dir)));
+
+		std::cout << from << "\t" << to << "\t" << read << "\t" << write << "\t" << (dir ? "L" : "R") << std::endl;
 	}
-	i++;
 
-	read = convertChar(machine.substr(i, 2));
-	i += 2;
-	write = convertChar(machine.substr(i, 2));
-	i += 2;
-
-	dir = machine[i++] == 'a';
-
-	{
-		using namespace std;
-		cout << "machine line: " << machine << endl;
-		cout << "machine length: " << machine.length() << endl;
-		cout << "i: " << i << endl;
-	}
-
-	if (machine.length() <= i) i--;
-	machine = machine.substr(i, (machine.length() - i)); // Prepare for next edge decoding
-
-	// Create states if needed
-	for (const auto& state : states) {
-		if (state->getNum() == from) sFrom = from;
-		if (state->getNum() == to) sTo = to;
-	}
-	
-	if (sFrom == -1) {
-		states.push_back(std::shared_ptr<State>::shared_ptr(new State(from, machine.length() == 1)));
-		std::cout << "Created state " << from << std::endl;
-	}
-	if (sTo == -1) {
-		states.push_back(std::shared_ptr<State>::shared_ptr(new State(to, machine.length() == 1)));
-		std::cout << "Created state " << to << std::endl;
-	}
-	
-	std::cout << from << "\t" << to << "\t" << read << "\t" << write << "\t" << dir << std::endl;
-
-	// Use these for readability
-	std::shared_ptr<State> fromPtr = std::shared_ptr<State>::shared_ptr(states.at(from).get());
-	std::shared_ptr<State> toPtr = std::shared_ptr<State>::shared_ptr(states.at(to).get());
-	std::shared_ptr<Edge> edgePtr = std::shared_ptr<Edge>(new Edge(read, write, dir));
-
-	addEdge(fromPtr, toPtr, edgePtr);
-	std::cout << "Machine length after decode: " << machine.length() << std::endl;
-	if (machine.length() > 1) decodeMachine(machine); // Run again if the machine length is still greater than 1
+	setTape(machine.substr(i, std::size(machine) - (unsigned)i));
 }
 
 char TuringMachine::convertChar(std::string code) {

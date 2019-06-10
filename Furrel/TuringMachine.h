@@ -36,8 +36,8 @@ public:
 	/* Set the tape to param and tape head to start */
 	void setTape(std::string input);
 private:
-	/* Recursively builds the TM */
-	void decodeMachine(std::string &machine);
+	/* Decodes the machine CWL */
+	void machineDecode(std::string machine);
 	
 	/* Converts the 2-char code into a single char */
 	char convertChar(std::string code);
