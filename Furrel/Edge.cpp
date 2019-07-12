@@ -10,7 +10,7 @@ Edge::Edge(char readC, char writeC, bool dirC) : read(readC), write(writeC), dir
 
 /* Getter Functions */
 
-char Edge::getRead() { return char(read); }
+char Edge::getRead() { return read; }
 
 char Edge::getWrite() { return write; }
 
