@@ -29,6 +29,9 @@ public:
 	
 	/* Prints the tape to console */
 	void printTape();
+
+	/* Prints the tape head to the console */
+	void printTapeHead();
 	
 	/* Returns character read by the tape head */
 	char getCurrentChar();
@@ -40,13 +43,16 @@ public:
 	void setTape(std::string input);
 private:
 	/* Decodes the machine CWL */
-	void machineDecode(std::string machine);
+	std::string machineDecode(std::string machine);
 	
 	/* Converts the 2-char code into a single char */
 	char convertChar(std::string code);
 
 	/* Returns vector of Links with start State passed */
 	std::vector<int> getLinks(const State& start);
+
+	/* Write char at the tape head */
+	void write(char letter);
 	
 	/* Vector of States */
 	std::vector<std::shared_ptr<State>> states;

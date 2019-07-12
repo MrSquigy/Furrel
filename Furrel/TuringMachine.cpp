@@ -7,14 +7,20 @@
 
 /* Public Member Functions */
 
+std::string getLine();
+
 TuringMachine::TuringMachine(std::string input) : tape() {
 	states.push_back(std::shared_ptr<State>::shared_ptr(new State(0)));
-	std::cout << "From\tTo\tRead\tWrite\tMove" << std::endl;
-	machineDecode(input);
+	std::string log = machineDecode(input);
+	
+	// Print stuff for user
+	std::cout << std::endl << "Machine Diagram" << std::endl << getLine() << "From\tTo\tRead\tWrite\tMove" << std::endl;
+	std::cout << log << std::endl;
+
 	tapeHead = tape.begin();
 	tapeHead++; // Move passed # in pos 0
-	std::cout << "Tape Head: " << *tapeHead << std::endl;
 	printTape();
+	printTapeHead();
 }
 
 TuringMachine::TuringMachine(TuringMachine& tm) : tapeHead(tm.tapeHead), tape() {
@@ -30,13 +36,36 @@ TuringMachine& TuringMachine::operator=(TuringMachine& tm) {
 	return *this;
 }
 
+template <class T>
+void printVector(std::vector<T> const &v) {
+	for (unsigned int i = 0; i < v.size(); i++) std::cout << v.at(i) << " ";
+}
+
 std::string TuringMachine::run() {
-	// TODO: Write this function lol
+	std::vector<int> availableLinks, operations;
+	int currentState = 0; // Index for State
+	bool moved;
 
-	State* currentState = (*states.begin()).get(); // Get the first state
+	while (!states.at(currentState)->isHaltState()) { // Run through Edges until a halt State is reached
+		moved = false;
+		availableLinks = getLinks(*states.at(currentState));
+		for (std::vector<int>::iterator i = availableLinks.begin(); i != availableLinks.end(); ++i) {
+			if (links.at(*i)->getTraversable(*tapeHead)) {
+				// Can get to the next State here
+				operations = links.at(*i)->traverse(*tapeHead);
+				printVector(operations);
+				write(char(operations.at(0)));
+				move(bool(operations.at(1)));
+				currentState = operations.at(2);
+				moved = true;
+			}
+		}
 
-	while (!currentState->isHaltState()) { // Run through Edges until a halt State is reached
-		break;
+		std::cout << "Current state: " << currentState << std::endl;
+		printTape();
+		printTapeHead();
+
+		if (!moved) return "The machine crashed";
 	}
 
 	return getTapeAsString();
@@ -48,10 +77,14 @@ void TuringMachine::addEdge(std::shared_ptr<State> firstState, std::shared_ptr<S
 		if (link->checkLink(*firstState, *secondState)) {
 			std::cout << "here" << std::endl;
 			link->addEdge(edge);
-			//std::cout << "Created edge (" << edge->getRead() << ", " << edge->getWrite() << ", " << edge->getDirection() << ") on link " << firstState->getNum() << " to " << secondState->getNum() << std::endl;
+			std::cout << "Created edge (" << edge->getRead() << ", " << edge->getWrite() << ", " << edge->getDirection() << ") on link " << firstState->getNum() << " to " << secondState->getNum() << std::endl;
 			return;
 		}
 	}
+
+	// Otherwise create one
+	links.push_back(std::shared_ptr<Link>::shared_ptr(new Link(firstState, secondState, edge)));
+	std::cout << "Created edge (" << edge->getRead() << ", " << edge->getWrite() << ", " << edge->getDirection() << ") on link " << firstState->getNum() << " to " << secondState->getNum() << std::endl;
 }
 
 void TuringMachine::move(bool dir) {
@@ -61,6 +94,10 @@ void TuringMachine::move(bool dir) {
 
 void TuringMachine::printTape() {
 	std::cout << "The Tape: " << getTapeAsString() << std::endl;
+}
+
+void TuringMachine::printTapeHead() {
+	std::cout << "Tape Head: " << *tapeHead << std::endl;
 }
 
 /* Getter Functions */
@@ -83,11 +120,17 @@ void TuringMachine::setTape(std::string input) {
 
 /* Private Member Functions */
 
-void TuringMachine::machineDecode(std::string machine) {
+std::string getLine() {
+	return "=========================================\n\n";
+}
+
+std::string TuringMachine::machineDecode(std::string machine) {
 	int from, to, lineStart, sFrom, sTo, i = 0;
 	char read, write, curr;
 	bool dir;
-	std::string localMachine = machine;
+	std::string localMachine = machine, ret;
+
+	std::cout << "Machine Decoding" << std::endl << getLine();
 
 	while (localMachine[i] != '#') {
 		// Set default vars for loop
@@ -129,11 +172,13 @@ void TuringMachine::machineDecode(std::string machine) {
 		}
 
 		addEdge(std::shared_ptr<State>::shared_ptr(states.at(from)), std::shared_ptr<State>::shared_ptr(states.at(to)), std::shared_ptr<Edge>(new Edge(read, write, dir)));
-
-		std::cout << from << "\t" << to << "\t" << read << "\t" << write << "\t" << (dir ? "L" : "R") << std::endl;
+		ret = ret + std::to_string(from) + "\t" + std::to_string(to) + "\t" + read + "\t" + write + "\t" + (dir ? "L" : "R") + "\n";
+		//std::cout << from << "\t" << to << "\t" << read << "\t" << write << "\t" << (dir ? "L" : "R") << std::endl;
 	}
 
-	setTape(machine.substr(i, std::size(localMachine) - (unsigned)i));
+	setTape(machine.substr(i, std::size(localMachine) - (unsigned)i) + "^^");
+
+	return ret;
 }
 
 char TuringMachine::convertChar(std::string code) {
@@ -156,4 +201,8 @@ std::vector<int> TuringMachine::getLinks(const State& start) {
 	}
 
 	return ret;
+}
+
+void TuringMachine::write(char letter) {
+	*tapeHead = letter;
 }
