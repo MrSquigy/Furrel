@@ -20,14 +20,24 @@ void Link::addEdge(char read, char write, bool dir) {
 	edges.push_back(std::shared_ptr<Edge>::shared_ptr(new Edge(read, write, dir)));
 }
 
-bool Link::canCross(char letter) { 
-	for (const auto &edge : edges) {
+bool Link::getTraversable(char letter) { 
+	for (const auto &edge : edges) if (letter == edge->getRead()) return true;
+	return false;
+}
+
+std::vector<int> Link::traverse(char letter) {
+	std::vector<int> ret;
+
+	for (const auto& edge : edges) {
 		if (letter == edge->getRead()) {
-			return true;
+
+			ret.push_back(int(edge->getWrite()));
+			ret.push_back(int(edge->getDirection()));
+			ret.push_back(endState->getNum());
 		}
 	}
 
-	return false;
+	return ret;
 }
 
 bool Link::checkLink(const State& start, const State& end) {

@@ -23,7 +23,13 @@ public:
 	void addEdge(char read, char write, bool dir);
 
 	/* Returns true if an Edge is traversable */
-	bool canCross(char letter);
+	bool getTraversable(char letter);
+
+	/* Traverses an Edge 
+	   Precondition: getTraversable == true
+	   Return val:   [char LetterToWrite, bool DirectionToMove, int NextStateNumber]
+	*/
+	std::vector<int> traverse(char letter);
 
 	/* Returns true if this link is between the States passed */
 	bool checkLink(const State& start, const State& end);
