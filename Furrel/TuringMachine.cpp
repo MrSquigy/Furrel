@@ -9,6 +9,9 @@
 
 std::string getLine();
 
+template <class T>
+void printVector(std::vector<T> const& v);
+
 TuringMachine::TuringMachine(std::string input) : tape() {
 	states.push_back(std::shared_ptr<State>::shared_ptr(new State(0)));
 	std::string log = machineDecode(input);
@@ -21,6 +24,12 @@ TuringMachine::TuringMachine(std::string input) : tape() {
 	tapeHead++; // Move passed # in pos 0
 	printTape();
 	printTapeHead();
+
+	std::cout << std::endl << std::endl << "Execution Trace" << std::endl << getLine();
+	std::string out = run();
+
+	std::cout << std::endl << std::endl << "Machine Output" << std::endl << getLine();
+	std::cout << out << std::endl;
 }
 
 TuringMachine::TuringMachine(TuringMachine& tm) : tapeHead(tm.tapeHead), tape() {
@@ -39,6 +48,7 @@ TuringMachine& TuringMachine::operator=(TuringMachine& tm) {
 template <class T>
 void printVector(std::vector<T> const &v) {
 	for (unsigned int i = 0; i < v.size(); i++) std::cout << v.at(i) << " ";
+	std::cout << std::endl;
 }
 
 std::string TuringMachine::run() {
@@ -47,26 +57,33 @@ std::string TuringMachine::run() {
 	bool moved;
 
 	while (!states.at(currentState)->isHaltState()) { // Run through Edges until a halt State is reached
-		moved = false;
-		availableLinks = getLinks(*states.at(currentState));
-		for (std::vector<int>::iterator i = availableLinks.begin(); i != availableLinks.end(); ++i) {
-			if (links.at(*i)->getTraversable(*tapeHead)) {
-				// Can get to the next State here
-				operations = links.at(*i)->traverse(*tapeHead);
-				printVector(operations);
-				write(char(operations.at(0)));
-				move(bool(operations.at(1)));
-				currentState = operations.at(2);
-				moved = true;
-			}
-		}
-
 		std::cout << "Current state: " << currentState << std::endl;
 		printTape();
 		printTapeHead();
 
+		moved = false;
+		availableLinks = getLinks(*states.at(currentState));
+
+		for (std::vector<int>::iterator i = availableLinks.begin(); i != availableLinks.end(); ++i) {
+			if (links.at(*i)->getTraversable(*tapeHead)) {
+				// Can get to the next State here
+				operations = links.at(*i)->traverse(*tapeHead);
+				write(char(operations.at(0)));
+				move(bool(operations.at(1)));
+				currentState = operations.at(2);
+				moved = true;
+				break;
+			}
+		}
+
 		if (!moved) return "The machine crashed";
+
+		std::cout << std::endl;
 	}
+
+	std::cout << "Current state: " << currentState << std::endl;
+	printTape();
+	printTapeHead();
 
 	return getTapeAsString();
 }
@@ -162,19 +179,22 @@ std::string TuringMachine::machineDecode(std::string machine) {
 		}
 
 		if (sFrom == -1) {
-			states.push_back(std::shared_ptr<State>::shared_ptr(new State(from, from == 1)));
+			states.push_back(std::shared_ptr<State>::shared_ptr(new State(from)));
 			std::cout << "Created state " << from << std::endl;
 		}
 
 		if (sTo == -1 && sTo != sFrom) {
-			states.push_back(std::shared_ptr<State>::shared_ptr(new State(to, to == 1)));
+			states.push_back(std::shared_ptr<State>::shared_ptr(new State(to)));
 			std::cout << "Created state " << to << std::endl;
 		}
 
 		addEdge(std::shared_ptr<State>::shared_ptr(states.at(from)), std::shared_ptr<State>::shared_ptr(states.at(to)), std::shared_ptr<Edge>(new Edge(read, write, dir)));
 		ret = ret + std::to_string(from) + "\t" + std::to_string(to) + "\t" + read + "\t" + write + "\t" + (dir ? "L" : "R") + "\n";
 		//std::cout << from << "\t" << to << "\t" << read << "\t" << write << "\t" << (dir ? "L" : "R") << std::endl;
+
 	}
+
+	states.at(states.size() - 1)->toggleHaltState(); // Make the last state a halt state
 
 	setTape(machine.substr(i, std::size(localMachine) - (unsigned)i) + "^^");
 
@@ -193,11 +213,9 @@ std::vector<int> TuringMachine::getLinks(const State& start) {
 	std::vector<int> ret;
 	int counter = 0;
 
-	for (const auto& link : links) {
-		if (link->checkLink(start)) {
-			ret.push_back(counter);
-			counter++;
-		}
+	for (unsigned int i = 0; i < links.size(); i++) {
+		std::shared_ptr<Link> link = links.at(i);
+		if (link->checkLink(start)) ret.push_back(i);
 	}
 
 	return ret;
