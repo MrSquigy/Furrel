@@ -19,6 +19,9 @@ public:
 
 	/* Returns true if this is a halt State */
 	bool isHaltState();
+
+	/* Toggles the status of haltState */
+	void toggleHaltState();
 private:
 	/* State number */
 	int num;
