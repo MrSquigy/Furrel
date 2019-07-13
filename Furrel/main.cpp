@@ -5,7 +5,7 @@
 #include "TuringMachine.h"
 
 int main() {
-	// Test tm that adds two numbers together, of the form a*ba*, with input 1 + 1
+	// Test tm that adds two numbers together, of the form a*ba*, with input 1, 1
 	std::string adderTM = "bbaaaabbababaabababaaaababaabbabaaaabaaabaabab#aba";
 	
 	TuringMachine adder(adderTM);
